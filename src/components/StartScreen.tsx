@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import { RawTopic } from '../types';
 import {
-  CheckSquare,
-  Square,
+  Check,
   Play,
   RotateCcw,
   CheckCircle2,
@@ -65,20 +64,20 @@ export const StartScreen: React.FC<StartScreenProps> = ({
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
       {/* Title & Introduction */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-semibold uppercase tracking-wider">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-semibold uppercase tracking-wider">
           <BookOpen className="w-3.5 h-3.5" />
           Universitet İmtahanına Hazırlıq
         </div>
         <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Mülki müdafiə – Özünüsınaq testi
         </h1>
-        <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base max-w-xl mx-auto">
+        <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
           Mövzuları seçərək biliyinizi yoxlayın. Hər testdə suallar və variantlar qarışdırılır, düzgün cavablar dəqiqliklə qorunur.
         </p>
 
         {/* Total Questions Verification Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-slate-700">
-          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 text-xs font-medium border border-slate-200 dark:border-slate-700">
+          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
           <span>Ümumi sual fondu: <strong>{totalAvailableQuestions} sual</strong> (7 mövzu)</span>
         </div>
       </div>
@@ -86,7 +85,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       {/* Topics Selection Box */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         {/* Controls Header */}
-        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-wrap items-center justify-between gap-3">
+        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/80 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Layers className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <span className="font-bold text-slate-900 dark:text-white text-base">
@@ -99,7 +98,11 @@ export const StartScreen: React.FC<StartScreenProps> = ({
               type="button"
               onClick={onSelectAll}
               disabled={isAllSelected}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/80 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+                isAllSelected
+                  ? 'bg-slate-100 dark:bg-slate-800/40 text-slate-400 dark:text-slate-600 border-slate-200 dark:border-slate-800 cursor-not-allowed'
+                  : 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/90 cursor-pointer'
+              }`}
             >
               Hamısını seç
             </button>
@@ -107,7 +110,11 @@ export const StartScreen: React.FC<StartScreenProps> = ({
               type="button"
               onClick={onClearAll}
               disabled={!hasAnySelected}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+                !hasAnySelected
+                  ? 'bg-slate-100 dark:bg-slate-800/40 text-slate-400 dark:text-slate-600 border-slate-200 dark:border-slate-800 cursor-not-allowed'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer'
+              }`}
             >
               Təmizlə
             </button>
@@ -115,7 +122,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
         </div>
 
         {/* Topic rows */}
-        <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
+        <div className="divide-y divide-slate-100 dark:divide-slate-800">
           {topics.map((topic) => {
             const isChecked = selectedTopicIds.includes(topic.id);
             return (
@@ -124,10 +131,11 @@ export const StartScreen: React.FC<StartScreenProps> = ({
                 htmlFor={`topic-checkbox-${topic.id}`}
                 className={`flex items-start gap-3.5 px-5 py-3.5 cursor-pointer select-none transition-colors ${
                   isChecked
-                    ? 'bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50/70 dark:hover:bg-blue-950/30'
+                    ? 'bg-blue-50/50 dark:bg-blue-950/30 hover:bg-blue-50/80 dark:hover:bg-blue-950/40'
                     : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'
                 }`}
               >
+                {/* Standard modern checkbox */}
                 <div className="pt-0.5">
                   <input
                     type="checkbox"
@@ -138,29 +146,33 @@ export const StartScreen: React.FC<StartScreenProps> = ({
                   />
                   <div
                     aria-hidden="true"
-                    className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
+                    className={`w-5 h-5 rounded-md flex items-center justify-center transition-all ${
                       isChecked
-                        ? 'bg-blue-600 text-white dark:bg-blue-500'
-                        : 'border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
+                        ? 'bg-blue-600 border border-blue-600 text-white dark:bg-blue-500 dark:border-blue-500 shadow-xs'
+                        : 'border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500'
                     }`}
                   >
-                    {isChecked ? (
-                      <CheckSquare className="w-4 h-4 fill-current" />
-                    ) : (
-                      <Square className="w-3.5 h-3.5 opacity-0" />
+                    {isChecked && (
+                      <Check className="w-3.5 h-3.5 stroke-[3] text-white" />
                     )}
                   </div>
                 </div>
 
                 <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100 leading-snug">
                     <span className="font-semibold text-blue-600 dark:text-blue-400 mr-1.5">
                       Mövzu {topic.id}.
                     </span>
                     <span>{topic.title}</span>
                   </div>
 
-                  <span className="self-start sm:self-auto shrink-0 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                  <span
+                    className={`self-start sm:self-auto shrink-0 text-xs font-semibold px-2.5 py-0.5 rounded-full border transition-colors ${
+                      isChecked
+                        ? 'bg-blue-100/70 text-blue-800 border-blue-200 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-800'
+                        : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                    }`}
+                  >
                     {topic.count} sual
                   </span>
                 </div>
@@ -171,10 +183,10 @@ export const StartScreen: React.FC<StartScreenProps> = ({
 
         {/* Live selected questions count footer */}
         <div className="px-5 py-3.5 bg-slate-50/80 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-sm">
-          <span className="text-slate-600 dark:text-slate-400">
+          <span className="text-slate-600 dark:text-slate-400 font-medium">
             Seçilmiş sual sayı:
           </span>
-          <span className="font-bold text-slate-900 dark:text-white text-base">
+          <span className="font-extrabold text-slate-900 dark:text-white text-base">
             {selectedQuestionsCount} sual
           </span>
         </div>

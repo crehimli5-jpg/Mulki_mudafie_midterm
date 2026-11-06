@@ -253,9 +253,9 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({
             const isCorrect = option.isCorrect;
 
             let cardStyles =
-              'border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800';
+              'border border-slate-200 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600';
             let badgeStyles =
-              'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600';
+              'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600';
             let iconElement: React.ReactNode = null;
             let statusText: string | null = null;
 
