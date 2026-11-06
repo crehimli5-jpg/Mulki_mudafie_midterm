@@ -149,3 +149,26 @@ test('prepareRetryQuizFromMissed builds reshuffled quiz for missed questions', (
   assert.ok(ids.includes(102));
   assert.ok(ids.includes(201));
 });
+
+test('both datasets (questions.json and r25.json) have exact expected counts and valid options', async () => {
+  const questionsData = await import('../data/questions.json', { with: { type: 'json' } });
+  const r25Data = await import('../data/r25.json', { with: { type: 'json' } });
+
+  // 1. Lecture set (questions.json): 367 questions, [54, 44, 54, 56, 63, 48, 48]
+  assert.equal(questionsData.default.questions.length, 367);
+  const lectureCounts = questionsData.default.topics.map((t: { count: number }) => t.count);
+  assert.deepEqual(lectureCounts, [54, 44, 54, 56, 63, 48, 48]);
+
+  // 2. R25 set (r25.json): 204 questions, [34, 31, 33, 22, 29, 23, 32]
+  assert.equal(r25Data.default.questions.length, 204);
+  const r25Counts = r25Data.default.topics.map((t: { count: number }) => t.count);
+  assert.deepEqual(r25Counts, [34, 31, 33, 22, 29, 23, 32]);
+
+  // Verify answer keys are within range
+  for (const q of questionsData.default.questions) {
+    assert.ok(q.correct >= 0 && q.correct < q.options.length, `q ${q.id} correct option out of bounds`);
+  }
+  for (const q of r25Data.default.questions) {
+    assert.ok(q.correct >= 0 && q.correct < q.options.length, `r25 q ${q.id} correct option out of bounds`);
+  }
+});

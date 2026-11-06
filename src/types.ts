@@ -48,7 +48,10 @@ export interface QuizStats {
 
 export type ReviewFilter = 'all' | 'wrong' | 'unanswered';
 
+export type QuestionSetId = 'lecture' | 'r25';
+
 export interface SavedSettings {
+  questionSet?: QuestionSetId;
   selectedTopicIds: number[];
   countLimit: number | 'all';
 }

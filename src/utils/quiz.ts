@@ -8,6 +8,7 @@ import {
   QuizStats,
   ReviewFilter,
   SavedSettings,
+  QuestionSetId,
 } from '../types';
 
 const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
@@ -226,17 +227,29 @@ export function getReviewList(
 
 const SETTINGS_KEY = 'mulki_mudafie_quiz_settings';
 
-export function loadSavedSettings(defaultTopicIds: number[]): SavedSettings {
+export function loadSavedSettings(defaultTopicIds: number[]): {
+  questionSet: QuestionSetId;
+  selectedTopicIds: number[];
+  countLimit: number | 'all';
+} {
   try {
     const saved = localStorage.getItem(SETTINGS_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
+      const questionSet: QuestionSetId = parsed.questionSet === 'r25' ? 'r25' : 'lecture';
+      const countLimit = parsed.countLimit === 'all' || typeof parsed.countLimit === 'number' ? parsed.countLimit : 'all';
       if (Array.isArray(parsed.selectedTopicIds) && parsed.selectedTopicIds.length > 0) {
         return {
+          questionSet,
           selectedTopicIds: parsed.selectedTopicIds,
-          countLimit: parsed.countLimit === 'all' || typeof parsed.countLimit === 'number' ? parsed.countLimit : 'all',
+          countLimit,
         };
       }
+      return {
+        questionSet,
+        selectedTopicIds: defaultTopicIds,
+        countLimit,
+      };
     }
   } catch (err) {
     // LocalStorage may be blocked or unavailable
@@ -244,6 +257,7 @@ export function loadSavedSettings(defaultTopicIds: number[]): SavedSettings {
   }
 
   return {
+    questionSet: 'lecture',
     selectedTopicIds: defaultTopicIds,
     countLimit: 'all',
   };

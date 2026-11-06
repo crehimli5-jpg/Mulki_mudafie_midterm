@@ -9,6 +9,7 @@ import {
   RawTopic,
   QuizQuestion,
   UserAnswers,
+  QuestionSetId,
 } from './types';
 import {
   prepareQuizQuestions,
@@ -19,9 +20,7 @@ import {
 
 // Import local questions data verbatim
 import rawData from './data/questions.json';
-
-const allTopics: RawTopic[] = rawData.topics;
-const allQuestions: RawQuestion[] = rawData.questions;
+import r25Data from './data/r25.json';
 
 export default function App() {
   return (
@@ -35,16 +34,24 @@ function MainApp() {
   // Screen state: 'start' | 'quiz' | 'results'
   const [screen, setScreen] = useState<'start' | 'quiz' | 'results'>('start');
 
+  // Load initial settings from localStorage (try/catch protected in quiz.ts)
+  const initialSettings = useMemo(() => loadSavedSettings([1, 2, 3, 4, 5, 6, 7]), []);
+
+  // Active question set: 'lecture' (367 questions) or 'r25' (204 questions)
+  const [activeSet, setActiveSet] = useState<QuestionSetId>(initialSettings.questionSet);
+
+  // Active dataset derived from activeSet
+  const currentDataset = useMemo(() => {
+    return activeSet === 'r25' ? r25Data : rawData;
+  }, [activeSet]);
+
+  const allTopics: RawTopic[] = currentDataset.topics;
+  const allQuestions: RawQuestion[] = currentDataset.questions;
+
   // Topic selection & question count limit (restored from localStorage)
-  const defaultTopicIds = useMemo(() => allTopics.map((t) => t.id), []);
-  const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>(() => {
-    const saved = loadSavedSettings(defaultTopicIds);
-    return saved.selectedTopicIds;
-  });
-  const [countLimit, setCountLimit] = useState<number | 'all'>(() => {
-    const saved = loadSavedSettings(defaultTopicIds);
-    return saved.countLimit;
-  });
+  const defaultTopicIds = useMemo(() => [1, 2, 3, 4, 5, 6, 7], []);
+  const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>(initialSettings.selectedTopicIds);
+  const [countLimit, setCountLimit] = useState<number | 'all'>(initialSettings.countLimit);
 
   // Active quiz state
   const [activeQuestions, setActiveQuestions] = useState<QuizQuestion[]>([]);
@@ -53,10 +60,16 @@ function MainApp() {
   // Sync settings changes to localStorage
   useEffect(() => {
     saveSettings({
+      questionSet: activeSet,
       selectedTopicIds,
       countLimit,
     });
-  }, [selectedTopicIds, countLimit]);
+  }, [activeSet, selectedTopicIds, countLimit]);
+
+  // Handle switching active question set
+  const handleSelectSet = useCallback((newSet: QuestionSetId) => {
+    setActiveSet(newSet);
+  }, []);
 
   // Handle topic toggle
   const handleToggleTopic = useCallback((topicId: number) => {
@@ -96,7 +109,7 @@ function MainApp() {
     setUserAnswers({});
     setScreen('quiz');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [selectedTopicIds, countLimit]);
+  }, [allQuestions, allTopics, selectedTopicIds, countLimit]);
 
   // Support ?autostart=1 query param (Ultra Mode testability requirement)
   useEffect(() => {
@@ -112,7 +125,7 @@ function MainApp() {
       setUserAnswers({});
       setScreen('quiz');
     }
-  }, [screen, selectedTopicIds, defaultTopicIds]);
+  }, [screen, allQuestions, allTopics, selectedTopicIds, defaultTopicIds]);
 
   // Record question answer
   const handleAnswerQuestion = useCallback((questionId: number, optionId: string) => {
@@ -164,7 +177,7 @@ function MainApp() {
     setUserAnswers({});
     setScreen('quiz');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [activeQuestions, userAnswers]);
+  }, [allQuestions, allTopics, activeQuestions, userAnswers]);
 
   // Restart with same topics & count limit, freshly reshuffled
   const handleRestartSameTopics = useCallback(() => {
@@ -177,10 +190,13 @@ function MainApp() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+  const activeSetName = activeSet === 'r25' ? 'R25' : 'Mühazirə sualları';
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <Header
         onTitleClick={handleReturnToTopics}
+        activeSetLabel={activeSetName}
         subtitle={
           screen === 'quiz'
             ? 'Test icrası'
@@ -196,6 +212,8 @@ function MainApp() {
             topics={allTopics}
             selectedTopicIds={selectedTopicIds}
             countLimit={countLimit}
+            activeSet={activeSet}
+            onSelectSet={handleSelectSet}
             onToggleTopic={handleToggleTopic}
             onSelectAll={handleSelectAllTopics}
             onClearAll={handleClearAllTopics}
@@ -228,7 +246,11 @@ function MainApp() {
 
       <footer className="border-t border-slate-200/60 dark:border-slate-800/80 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
         <div className="max-w-4xl mx-auto px-4">
-          <p>© 2026 Mülki müdafiə imtahanına hazırlıq portalı. Bütün 367 sual orijinal mətn üzrə təqdim edilir.</p>
+          <p>
+            © 2026 Mülki müdafiə imtahanına hazırlıq portalı.{' '}
+            {activeSet === 'r25' ? 'R25 sualları (204 sual)' : 'Mühazirə sualları (367 sual)'}{' '}
+            orijinal mətn üzrə təqdim edilir.
+          </p>
         </div>
       </footer>
     </div>

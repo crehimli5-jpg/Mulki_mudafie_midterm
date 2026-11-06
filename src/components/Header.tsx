@@ -5,9 +5,10 @@ import { useTheme } from '../context/ThemeContext';
 interface HeaderProps {
   onTitleClick?: () => void;
   subtitle?: string;
+  activeSetLabel?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onTitleClick, subtitle }) => {
+export const Header: React.FC<HeaderProps> = ({ onTitleClick, subtitle, activeSetLabel }) => {
   const { theme, resolvedTheme, setTheme } = useTheme();
 
   const toggleTheme = () => {
@@ -39,6 +40,11 @@ export const Header: React.FC<HeaderProps> = ({ onTitleClick, subtitle }) => {
               <span className="hidden sm:inline-block px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                 Özünüsınaq
               </span>
+              {activeSetLabel && (
+                <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                  {activeSetLabel}
+                </span>
+              )}
             </div>
             {subtitle ? (
               <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">

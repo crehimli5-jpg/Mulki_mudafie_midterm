@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { RawTopic } from '../types';
+import { RawTopic, QuestionSetId } from '../types';
 import {
   Check,
   Play,
@@ -9,12 +9,16 @@ import {
   Sliders,
   Layers,
   HelpCircle,
+  Database,
+  FileCheck2,
 } from 'lucide-react';
 
 interface StartScreenProps {
   topics: RawTopic[];
   selectedTopicIds: number[];
   countLimit: number | 'all';
+  activeSet: QuestionSetId;
+  onSelectSet: (set: QuestionSetId) => void;
   onToggleTopic: (topicId: number) => void;
   onSelectAll: () => void;
   onClearAll: () => void;
@@ -35,6 +39,8 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   topics,
   selectedTopicIds,
   countLimit,
+  activeSet,
+  onSelectSet,
   onToggleTopic,
   onSelectAll,
   onClearAll,
@@ -78,7 +84,93 @@ export const StartScreen: React.FC<StartScreenProps> = ({
         {/* Total Questions Verification Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 text-xs font-medium border border-slate-200 dark:border-slate-700">
           <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span>Ümumi sual fondu: <strong>{totalAvailableQuestions} sual</strong> (7 mövzu)</span>
+          <span>
+            {activeSet === 'lecture' ? 'Mühazirə sualları: ' : 'R25 sualları: '}
+            <strong>{totalAvailableQuestions} sual</strong> (7 mövzu)
+          </span>
+        </div>
+      </div>
+
+      {/* Sual toplusu (Question Set Selector) - Two big radio cards */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Database className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <h2 className="font-bold text-slate-900 dark:text-white text-base">
+              Sual toplusu
+            </h2>
+          </div>
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            İstifadə ediləcək test bazasını seçin
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-label="Sual toplusu seçimi">
+          {/* Option 1: Mühazirə sualları */}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={activeSet === 'lecture'}
+            onClick={() => onSelectSet('lecture')}
+            className={`w-full p-4 rounded-xl text-left transition-all border cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
+              activeSet === 'lecture'
+                ? 'border-2 border-blue-600 dark:border-blue-500 bg-blue-50/60 dark:bg-blue-950/40 text-blue-950 dark:text-blue-50 ring-2 ring-blue-500/20 shadow-xs'
+                : 'border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <div className="font-bold text-base text-slate-900 dark:text-white">
+                  Mühazirə sualları
+                </div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">
+                  Əsas mühazirə materialları üzrə tam baza
+                </div>
+              </div>
+              <span
+                className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-full border ${
+                  activeSet === 'lecture'
+                    ? 'bg-blue-600 text-white border-blue-600 dark:bg-blue-500 dark:border-blue-500'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600'
+                }`}
+              >
+                367 sual
+              </span>
+            </div>
+          </button>
+
+          {/* Option 2: R25 – Modul 1 Ara imtahan 1 */}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={activeSet === 'r25'}
+            onClick={() => onSelectSet('r25')}
+            className={`w-full p-4 rounded-xl text-left transition-all border cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
+              activeSet === 'r25'
+                ? 'border-2 border-blue-600 dark:border-blue-500 bg-blue-50/60 dark:bg-blue-950/40 text-blue-950 dark:text-blue-50 ring-2 ring-blue-500/20 shadow-xs'
+                : 'border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <div className="font-bold text-base text-slate-900 dark:text-white">
+                  R25 – Modul 1 Ara imtahan 1
+                </div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">
+                  R25 ara imtahan sualları toplusu
+                </div>
+              </div>
+              <span
+                className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-full border ${
+                  activeSet === 'r25'
+                    ? 'bg-blue-600 text-white border-blue-600 dark:bg-blue-500 dark:border-blue-500'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600'
+                }`}
+              >
+                204 sual
+              </span>
+            </div>
+          </button>
         </div>
       </div>
 
